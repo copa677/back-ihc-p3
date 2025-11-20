@@ -1,0 +1,80 @@
+# ----------------------------------------
+# Entornos virtuales
+# ----------------------------------------
+venv/
+ENV/
+env/
+.venv/
+
+# ----------------------------------------
+# Archivos de Python
+# ----------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ----------------------------------------
+# Archivos y carpetas de configuración
+# ----------------------------------------
+*.env
+*.env.*
+*.flaskenv
+
+# ----------------------------------------
+# Archivos de logs
+# ----------------------------------------
+*.log
+log/
+logs/
+
+# ----------------------------------------
+# Archivos de bases de datos locales
+# ----------------------------------------
+instance/
+*.db
+*.sqlite3
+
+# ----------------------------------------
+# Migraciones (si usas Flask-Migrate)
+# Puedes quitarlo si quieres versionarlas
+# ----------------------------------------
+migrations/versions/*.pyc
+migrations/versions/*
+
+# ----------------------------------------
+# Archivos temporales
+# ----------------------------------------
+*.tmp
+*.swp
+*.swo
+.DS_Store
+
+# ----------------------------------------
+# Archivos de coverage / testing
+# ----------------------------------------
+.coverage
+htmlcov/
+.cache/
+.tox/
+pytest_cache/
+
+# ----------------------------------------
+# Caches de herramientas
+# ----------------------------------------
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# ----------------------------------------
+# IDEs
+# ----------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ----------------------------------------
+# Docker
+# ----------------------------------------
+*.pid

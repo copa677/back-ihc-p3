@@ -1,0 +1,268 @@
+🎯 EJEMPLOS DE RUTAS PARA THUNDER CLIENT
+
+📍 URL BASE: http://localhost:5000/api
+
+========================================================================
+🔐 AUTH - AUTENTICACIÓN
+========================================================================
+
+POST http://localhost:5000/api/auth/registro
+{
+  "username": "usuario1",
+  "password": "password123",
+  "tipo_usuario": "movil"
+}
+
+POST http://localhost:5000/api/auth/login
+{
+  "username": "usuario1",
+  "password": "password123"
+}
+
+GET http://localhost:5000/api/auth/me
+
+========================================================================
+👥 USUARIOS
+========================================================================
+
+GET http://localhost:5000/api/usuarios/
+
+GET http://localhost:5000/api/usuarios/1
+
+PUT http://localhost:5000/api/usuarios/1
+{
+  "username": "nuevo_usuario",
+  "tipo_usuario": "admin"
+}
+
+DELETE http://localhost:5000/api/usuarios/1
+
+========================================================================
+🛒 PRODUCTOS
+========================================================================
+
+POST http://localhost:5000/api/productos/
+{
+  "name": "iPhone 15 Pro",
+  "price": 1299.99,
+  "image": "https://example.com/iphone.jpg",
+  "category": "smartphones"
+}
+
+GET http://localhost:5000/api/productos/
+
+GET http://localhost:5000/api/productos/categoria/smartphones
+
+GET http://localhost:5000/api/productos/1
+
+PUT http://localhost:5000/api/productos/1
+{
+  "name": "iPhone 15 Pro Max",
+  "price": 1399.99,
+  "category": "smartphones"
+}
+
+DELETE http://localhost:5000/api/productos/1
+
+========================================================================
+🛍️ CARRITO
+========================================================================
+
+POST http://localhost:5000/api/carrito/usuario/1
+
+GET http://localhost:5000/api/carrito/usuario/1
+
+GET http://localhost:5000/api/carrito/
+
+POST http://localhost:5000/api/carrito/1/agregar-item
+{
+  "producto_id": 1,
+  "cantidad": 2
+}
+
+PUT http://localhost:5000/api/carrito/item/1
+{
+  "cantidad": 3
+}
+
+DELETE http://localhost:5000/api/carrito/item/1
+
+DELETE http://localhost:5000/api/carrito/1/vaciar
+
+DELETE http://localhost:5000/api/carrito/1
+
+========================================================================
+📦 DATOS ENVÍO
+========================================================================
+
+POST http://localhost:5000/api/datos-envio/
+{
+  "direccion1": "Calle Principal 123",
+  "direccion2": "Edificio A",
+  "ciudad": "Ciudad de México",
+  "region": "CDMX",
+  "codigo_postal": "01000",
+  "nombre_completo": "Juan Pérez García",
+  "telefono": "+52 55 1234 5678",
+  "comentario": "Dejar en recepción",
+  "usuario_id": 1
+}
+
+GET http://localhost:5000/api/datos-envio/
+
+GET http://localhost:5000/api/datos-envio/usuario/1
+
+GET http://localhost:5000/api/datos-envio/1
+
+PUT http://localhost:5000/api/datos-envio/1
+{
+  "direccion1": "Avenida Reforma 456",
+  "ciudad": "Guadalajara",
+  "telefono": "+52 33 9876 5432"
+}
+
+DELETE http://localhost:5000/api/datos-envio/1
+
+========================================================================
+💳 DATOS PAGO
+========================================================================
+
+POST http://localhost:5000/api/datos-pago/
+{
+  "numero_tarjeta": "4111111111111111",
+  "fecha_expiracion_tarjeta": "12/2025",
+  "nombre_propietario": "JUAN PEREZ GARCIA",
+  "codigo_seguridad": "123",
+  "pais": "México",
+  "codigo_postal": "01000",
+  "usuario_id": 1
+}
+
+GET http://localhost:5000/api/datos-pago/
+
+GET http://localhost:5000/api/datos-pago/usuario/1
+
+GET http://localhost:5000/api/datos-pago/1
+
+PUT http://localhost:5000/api/datos-pago/1
+{
+  "fecha_expiracion_tarjeta": "06/2026",
+  "codigo_seguridad": "456"
+}
+
+DELETE http://localhost:5000/api/datos-pago/1
+
+========================================================================
+📋 ORDEN
+========================================================================
+
+POST http://localhost:5000/api/orden/
+{
+  "usuario_id": 1,
+  "estado": "pendiente"
+}
+
+GET http://localhost:5000/api/orden/
+
+GET http://localhost:5000/api/orden/usuario/1
+
+GET http://localhost:5000/api/orden/estado/pendiente
+
+GET http://localhost:5000/api/orden/1
+
+POST http://localhost:5000/api/orden/1/agregar-detalle
+{
+  "producto_id": 1,
+  "cantidad": 2,
+  "precio_unitario": 1299.99
+}
+
+PUT http://localhost:5000/api/orden/1/estado
+{
+  "estado": "completada"
+}
+
+PUT http://localhost:5000/api/orden/detalle/1
+{
+  "cantidad": 3
+}
+
+DELETE http://localhost:5000/api/orden/detalle/1
+
+POST http://localhost:5000/api/orden/1/factura
+{
+  "tipo_pago": "tarjeta"
+}
+
+DELETE http://localhost:5000/api/orden/1
+
+========================================================================
+🧾 FACTURA
+========================================================================
+
+GET http://localhost:5000/api/factura/
+
+GET http://localhost:5000/api/factura/1
+
+GET http://localhost:5000/api/factura/orden/1
+
+GET http://localhost:5000/api/factura/estado/pendiente
+
+PUT http://localhost:5000/api/factura/1/estado
+{
+  "estado": "pagada"
+}
+
+DELETE http://localhost:5000/api/factura/1
+
+========================================================================
+🔄 FLUJO COMPLETO DE EJEMPLO
+========================================================================
+
+1. Crear usuario:
+POST http://localhost:5000/api/auth/registro
+{"username": "cliente1", "password": "cliente123", "tipo_usuario": "movil"}
+
+2. Crear productos:
+POST http://localhost:5000/api/productos/
+{"name": "Laptop Gaming", "price": 1599.99, "category": "computadoras", "image": "https://example.com/laptop.jpg"}
+
+POST http://localhost:5000/api/productos/
+{"name": "Mouse Inalámbrico", "price": 49.99, "category": "accesorios", "image": "https://example.com/mouse.jpg"}
+
+3. Crear carrito:
+POST http://localhost:5000/api/carrito/usuario/1
+
+4. Agregar items al carrito:
+POST http://localhost:5000/api/carrito/1/agregar-item
+{"producto_id": 1, "cantidad": 1}
+
+POST http://localhost:5000/api/carrito/1/agregar-item
+{"producto_id": 2, "cantidad": 2}
+
+5. Crear orden:
+POST http://localhost:5000/api/orden/
+{"usuario_id": 1}
+
+6. Agregar detalles a orden:
+POST http://localhost:5000/api/orden/1/agregar-detalle
+{"producto_id": 1, "cantidad": 1, "precio_unitario": 1599.99}
+
+POST http://localhost:5000/api/orden/1/agregar-detalle
+{"producto_id": 2, "cantidad": 2, "precio_unitario": 49.99}
+
+7. Completar orden:
+PUT http://localhost:5000/api/orden/1/estado
+{"estado": "completada"}
+
+8. Crear factura:
+POST http://localhost:5000/api/orden/1/factura
+{"tipo_pago": "tarjeta"}
+
+9. Pagar factura:
+PUT http://localhost:5000/api/factura/1/estado
+{"estado": "pagada"}
+
+10. Verificar todo:
+GET http://localhost:5000/api/orden/1
+GET http://localhost:5000/api/factura/1

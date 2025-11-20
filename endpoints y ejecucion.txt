@@ -1,0 +1,127 @@
+🎯 ENDPOINTS DEL BACKEND FLASK - API REST
+
+📍 URL BASE: http://localhost:5000/api
+
+========================================================================
+🔐 AUTH - AUTENTICACIÓN
+========================================================================
+POST   /auth/registro          # Registrar nuevo usuario
+POST   /auth/login             # Iniciar sesión
+GET    /auth/me                # Obtener usuario actual (token)
+
+========================================================================
+👥 USUARIOS
+========================================================================
+GET    /usuarios/              # Obtener todos los usuarios
+GET    /usuarios/{id}          # Obtener usuario por ID
+PUT    /usuarios/{id}          # Actualizar usuario
+DELETE /usuarios/{id}          # Eliminar usuario
+
+========================================================================
+🛒 PRODUCTOS
+========================================================================
+POST   /productos/             # Crear producto
+GET    /productos/             # Obtener todos los productos
+GET    /productos/categoria/{categoria}  # Obtener por categoría
+GET    /productos/{id}         # Obtener producto por ID
+PUT    /productos/{id}         # Actualizar producto
+DELETE /productos/{id}         # Eliminar producto
+
+========================================================================
+🛍️ CARRITO
+========================================================================
+POST   /carrito/usuario/{usuario_id}              # Crear carrito
+GET    /carrito/usuario/{usuario_id}              # Obtener carrito de usuario
+GET    /carrito/                                 # Obtener todos los carritos
+POST   /carrito/{carrito_id}/agregar-item        # Agregar item al carrito
+PUT    /carrito/item/{item_id}                   # Actualizar cantidad de item
+DELETE /carrito/item/{item_id}                   # Eliminar item del carrito
+DELETE /carrito/{carrito_id}/vaciar              # Vaciar carrito
+DELETE /carrito/{carrito_id}                     # Eliminar carrito completo
+
+========================================================================
+📦 DATOS ENVÍO
+========================================================================
+POST   /datos-envio/                    # Crear datos de envío
+GET    /datos-envio/                    # Obtener todos los datos de envío
+GET    /datos-envio/usuario/{usuario_id} # Obtener por usuario
+GET    /datos-envio/{id}                # Obtener por ID
+PUT    /datos-envio/{id}                # Actualizar datos de envío
+DELETE /datos-envio/{id}                # Eliminar datos de envío
+
+========================================================================
+💳 DATOS PAGO
+========================================================================
+POST   /datos-pago/                     # Crear datos de pago
+GET    /datos-pago/                     # Obtener todos los datos de pago
+GET    /datos-pago/usuario/{usuario_id}  # Obtener por usuario
+GET    /datos-pago/{id}                 # Obtener por ID
+PUT    /datos-pago/{id}                 # Actualizar datos de pago
+DELETE /datos-pago/{id}                 # Eliminar datos de pago
+
+========================================================================
+📋 ORDEN
+========================================================================
+POST   /orden/                          # Crear orden
+GET    /orden/                          # Obtener todas las órdenes
+GET    /orden/usuario/{usuario_id}       # Obtener por usuario
+GET    /orden/estado/{estado}           # Obtener por estado
+GET    /orden/{cod}                     # Obtener orden por código
+POST   /orden/{cod}/agregar-detalle     # Agregar detalle a orden
+PUT    /orden/{cod}/estado              # Actualizar estado de orden
+PUT    /orden/detalle/{detalle_id}      # Actualizar cantidad de detalle
+DELETE /orden/detalle/{detalle_id}      # Eliminar detalle de orden
+POST   /orden/{cod}/factura             # Crear factura desde orden
+DELETE /orden/{cod}                     # Eliminar orden
+
+========================================================================
+🧾 FACTURA
+========================================================================
+GET    /factura/                        # Obtener todas las facturas
+GET    /factura/{cod}                   # Obtener factura por código
+GET    /factura/orden/{orden_cod}       # Obtener factura por orden
+GET    /factura/estado/{estado}         # Obtener facturas por estado
+PUT    /factura/{cod}/estado            # Actualizar estado de factura
+DELETE /factura/{cod}                   # Eliminar factura
+
+========================================================================
+🚀 CÓMO EJECUTAR EL PROYECTO
+========================================================================
+
+1. 📋 PREREQUISITOS
+   - Python 3.8+
+   - PostgreSQL instalado y corriendo
+   - pip (gestor de paquetes de Python)
+
+2. 🛠 CONFIGURACIÓN INICIAL
+   ```bash
+   # Clonar el proyecto (si aplica)
+   git clone <tu-repositorio>
+   cd mi_api_rest
+
+   # Crear entorno virtual
+   python -m venv venv
+
+   # Activar entorno virtual
+   # Windows:
+   venv\Scripts\activate
+   # Linux/Mac:
+   source venv/bin/activate
+
+   # Instalar dependencias
+   pip install -r requirements.txt
+
+CONFIGURACIÓN DE LA BASE DE DATOS:
+# Inicializar migraciones
+flask db init
+
+# Crear migración inicial
+flask db migrate -m "Migración inicial"
+
+# Aplicar migraciones
+flask db upgrade
+
+EJECUTAR LA APLICACION:
+
+python run.py
+
