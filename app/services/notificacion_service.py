@@ -109,18 +109,85 @@ class NotificacionService:
                 
             elif respuesta == 'rechazar':
                 notificacion.estado = 'rechazada'
-                mensaje = 'Orden rechazada correctamente'
+                notificacion.visto = True
                 
-                # Aquí podrías buscar otro delivery automáticamente
-                # NotificacionService.reasignar_orden(notificacion.orden_cod)
-            else:
-                return None, "Respuesta no válida. Use 'aceptar' o 'rechazar'"
-            
-            notificacion.visto = True
+                # ✅ NUEVO: Re-asignar automáticamente a otro delivery
+                reasignacion_exitosa = NotificacionService.reasignar_orden(
+                    notificacion.orden_cod, 
+                    notificacion.user_delivery_id  # Excluir al que rechazó
+                )
+                
+                if reasignacion_exitosa:
+                    mensaje = 'Orden rechazada. Se ha asignado a otro delivery.'
+                else:
+                    mensaje = 'Orden rechazada. No hay más deliveries disponibles.'
+                    
             db.session.commit()
-            
             return notificacion, mensaje
             
         except SQLAlchemyError as e:
             db.session.rollback()
             return None, f"Error al procesar respuesta: {str(e)}"
+        
+    @staticmethod
+    def reasignar_orden(orden_cod, delivery_excluido_id):
+        """Re-asigna la orden a otro delivery disponible"""
+        try:
+            # Buscar orden para obtener coordenadas del cliente
+            from app.services.orden_service import OrdenService
+            from app.models.datos_envio import DatosEnvio
+
+            orden = OrdenService.obtener_orden_por_cod(orden_cod)
+            
+            if not orden:
+                return False
+            
+            # Obtener datos de envío del cliente
+            datos_envio = DatosEnvio.query.filter_by(
+                user_telegram_id=orden.user_telegram_id
+            ).first()
+            
+            if not datos_envio or not datos_envio.latitud or not datos_envio.longitud:
+                return False
+            
+            # Buscar otro delivery (excluyendo al que rechazó)
+            deliveries = UserDelivery.query.filter(
+                UserDelivery.esta_activo == True,
+                UserDelivery.id != delivery_excluido_id,
+                UserDelivery.latitud.isnot(None),
+                UserDelivery.longitud.isnot(None)
+            ).all()
+            
+            if not deliveries:
+                return False
+            
+            # Encontrar el más cercano entre los disponibles
+            delivery_cercano = None
+            distancia_minima = float('inf')
+            
+            for delivery in deliveries:
+                distancia = NotificacionService.calcular_distancia(
+                    float(datos_envio.latitud), float(datos_envio.longitud),
+                    float(delivery.latitud), float(delivery.longitud)
+                )
+                if distancia < distancia_minima:
+                    distancia_minima = distancia
+                    delivery_cercano = delivery
+            
+            if delivery_cercano:
+                # Crear nueva notificación para el siguiente delivery
+                notificacion = Notificacion(
+                    user_delivery_id=delivery_cercano.id,
+                    orden_cod=orden_cod,
+                    tipo='nueva_orden',
+                    mensaje=f'Nueva orden #{orden_cod} disponible para entrega (reasignada)',
+                    estado='pendiente'
+                )
+                db.session.add(notificacion)
+                return True
+            
+            return False
+            
+        except Exception as e:
+            print(f"Error en reasignación: {str(e)}")
+            return False
