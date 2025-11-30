@@ -42,11 +42,11 @@ def obtener_todos_datos_envio():
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
 
-@datos_envio_bp.route('/usuario/<int:usuario_id>', methods=['GET'])
-def obtener_datos_envio_usuario(usuario_id):
+@datos_envio_bp.route('/usuario/<int:user_telegram_id>', methods=['GET'])
+def obtener_datos_envio_usuario(user_telegram_id):
     """Obtiene los datos de envío de un usuario específico"""
     try:
-        datos_envio = DatosEnvioService.obtener_datos_envio_por_usuario(usuario_id)
+        datos_envio = DatosEnvioService.obtener_datos_envio_por_usuario(user_telegram_id)
         
         return jsonify({
             'datos_envio': [de.to_dict() for de in datos_envio]

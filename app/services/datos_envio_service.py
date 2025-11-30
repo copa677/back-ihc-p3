@@ -9,15 +9,15 @@ class DatosEnvioService:
         """Crea nuevos datos de envío"""
         try:
             datos_envio = DatosEnvio(
-                direccion1=datos['direccion1'],
-                direccion2=datos.get('direccion2'),
+                latitud=datos['latitud'],
+                longitud=datos.get('longitud'),
                 ciudad=datos['ciudad'],
                 region=datos['region'],
                 codigo_postal=datos['codigo_postal'],
                 nombre_completo=datos['nombre_completo'],
                 telefono=datos['telefono'],
                 comentario=datos.get('comentario'),
-                usuario_id=datos['usuario_id']
+                user_telegram_id=datos['user_telegram_id']
             )
             
             db.session.add(datos_envio)
@@ -37,10 +37,10 @@ class DatosEnvioService:
             return None
     
     @staticmethod
-    def obtener_datos_envio_por_usuario(usuario_id):
+    def obtener_datos_envio_por_usuario(user_telegram_id):
         """Obtiene todos los datos de envío de un usuario"""
         try:
-            return DatosEnvio.query.filter_by(usuario_id=usuario_id).all()
+            return DatosEnvio.query.filter_by(user_telegram_id=user_telegram_id).all()
         except SQLAlchemyError:
             return []
     

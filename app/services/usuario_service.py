@@ -1,20 +1,19 @@
-from app.models.usuario import Usuario
+from app.models.user_delivery import UserDelivery
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
 
 class UsuarioService:
     
     @staticmethod
-    def crear_usuario(username, password, tipo_usuario='usuario'):
+    def crear_usuario(username, password):
         """Crea un nuevo usuario"""
         try:
             # Verificar si el usuario ya existe
-            if Usuario.query.filter_by(username=username).first():
+            if UserDelivery.query.filter_by(username=username).first():
                 return None, "El nombre de usuario ya existe"
             
-            usuario = Usuario(
+            usuario = UserDelivery(
                 username=username,
-                tipo_usuario=tipo_usuario
             )
             usuario.set_password(password)
             
@@ -31,7 +30,7 @@ class UsuarioService:
     def obtener_usuario_por_id(usuario_id):
         """Obtiene un usuario por su ID"""
         try:
-            return Usuario.query.get(usuario_id)
+            return UserDelivery.query.get(usuario_id)
         except SQLAlchemyError:
             return None
     
@@ -39,7 +38,7 @@ class UsuarioService:
     def obtener_usuario_por_username(username):
         """Obtiene un usuario por su username"""
         try:
-            return Usuario.query.filter_by(username=username).first()
+            return UserDelivery.query.filter_by(username=username).first()
         except SQLAlchemyError:
             return None
     
@@ -47,7 +46,7 @@ class UsuarioService:
     def autenticar_usuario(username, password):
         """Autentica un usuario con username y password"""
         try:
-            usuario = Usuario.query.filter_by(username=username, esta_activo=True).first()
+            usuario = UserDelivery.query.filter_by(username=username, esta_activo=True).first()
             if usuario and usuario.check_password(password):
                 return usuario, None
             return None, "Credenciales inválidas"
@@ -58,7 +57,7 @@ class UsuarioService:
     def obtener_todos_los_usuarios():
         """Obtiene todos los usuarios"""
         try:
-            return Usuario.query.all()
+            return UserDelivery.query.all()
         except SQLAlchemyError:
             return []
     
@@ -66,7 +65,7 @@ class UsuarioService:
     def actualizar_usuario(usuario_id, datos_actualizados):
         """Actualiza los datos de un usuario"""
         try:
-            usuario = Usuario.query.get(usuario_id)
+            usuario = UserDelivery.query.get(usuario_id)
             if not usuario:
                 return None, "Usuario no encontrado"
             
@@ -88,7 +87,7 @@ class UsuarioService:
     def eliminar_usuario(usuario_id):
         """Elimina un usuario (borrado lógico)"""
         try:
-            usuario = Usuario.query.get(usuario_id)
+            usuario = UserDelivery.query.get(usuario_id)
             if not usuario:
                 return False, "Usuario no encontrado"
             

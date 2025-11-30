@@ -1,30 +1,25 @@
-from flask_jwt_extended import create_access_token
-
+from flask_jwt_extended import create_access_token, get_jwt
+import datetime
+import time
 
 def crear_token_usuario(usuario):
-    """Crea un token JWT para el usuario"""
-    identity = {
+    """Crea un token JWT con la estructura exacta que necesitas"""
+    
+    # Calcular timestamps
+    now = datetime.datetime.utcnow()
+    nbf_timestamp = int(time.mktime(now.timetuple()))  # Not Before
+    exp_timestamp = int(time.mktime((now + datetime.timedelta(hours=24)).timetuple()))  # Expiration
+    
+    # Configurar claims personalizados
+    additional_claims = {
         'id': usuario.id,
         'username': usuario.username,
-        'tipo_usuario': usuario.tipo_usuario
+        'nbf': nbf_timestamp,
+        'exp': exp_timestamp
     }
     
     token = create_access_token(
-        identity=identity
+        identity=usuario.username,  # O puedes usar usuario.id
+        additional_claims=additional_claims
     )
     return token
-
-def extraer_datos_token(identity):
-    """Extrae los datos del usuario del token JWT"""
-    if isinstance(identity, dict):
-        return {
-            'id': identity.get('id'),
-            'username': identity.get('username'),
-            'tipo_usuario': identity.get('tipo_usuario')
-        }
-    # Si identity no es un diccionario, podría ser solo el ID
-    return {
-        'id': identity,
-        'username': None,
-        'tipo_usuario': None
-    }

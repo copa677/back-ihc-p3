@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.usuario_service import UsuarioService
-from app.utils.security import crear_token_usuario, extraer_datos_token
+from app.utils.security import crear_token_usuario
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -20,7 +20,6 @@ def registro():
         usuario, error = UsuarioService.crear_usuario(
             username=data.get('username'),
             password=data.get('password'),
-            tipo_usuario=data.get('tipo_usuario', 'usuario')
         )
         
         if error:
@@ -61,30 +60,8 @@ def login():
         # Crear token
         token = crear_token_usuario(usuario)
         
-        return jsonify({
-            'mensaje': 'Login exitoso',
-            'token': token,
-            'usuario': usuario.to_dict()
-        }), 200
+        return token, 200
         
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
 
-@auth_bp.route('/me', methods=['GET'])
-@jwt_required()
-def obtener_usuario_actual():
-    """Obtiene la información del usuario actual basado en el token"""
-    try:
-        identity = get_jwt_identity()
-        datos_usuario = extraer_datos_token(identity)
-        
-        usuario = UsuarioService.obtener_usuario_por_id(datos_usuario['id'])
-        if not usuario:
-            return jsonify({'error': 'Usuario no encontrado'}), 404
-        
-        return jsonify({
-            'usuario': usuario.to_dict()
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500

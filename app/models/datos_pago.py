@@ -1,5 +1,11 @@
 from app import db
 from datetime import datetime
+import pytz
+
+def get_bolivia_time():
+    """Obtiene la hora actual en zona horaria de Bolivia (UTC-4)"""
+    bolivia_tz = pytz.timezone('America/La_Paz')
+    return datetime.now(bolivia_tz)
 
 class DatosPago(db.Model):
     __tablename__ = 'datos_pago'
@@ -11,10 +17,19 @@ class DatosPago(db.Model):
     codigo_seguridad = db.Column(db.String(4), nullable=False)
     pais = db.Column(db.String(100), nullable=False)
     codigo_postal = db.Column(db.String(20), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    user_telegram_id = db.Column(db.Integer, db.ForeignKey('user_telegram.id'), nullable=False)
+    fecha_creacion = db.Column(db.DateTime, default=lambda: get_bolivia_time())
 
     def to_dict(self):
+        # Convertir a zona horaria de Bolivia para la respuesta
+        bolivia_tz = pytz.timezone('America/La_Paz')
+        
+        fecha_creacion_bolivia = self.fecha_creacion
+        
+        # Si la fecha está en UTC, convertirla a Bolivia
+        if self.fecha_creacion.tzinfo is None:
+            fecha_creacion_bolivia = pytz.utc.localize(self.fecha_creacion).astimezone(bolivia_tz)
+        
         return {
             'id': self.id,
             'numero_tarjeta': self.numero_tarjeta,
@@ -23,8 +38,9 @@ class DatosPago(db.Model):
             'codigo_seguridad': self.codigo_seguridad,
             'pais': self.pais,
             'codigo_postal': self.codigo_postal,
-            'usuario_id': self.usuario_id,
-            'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None
+            'user_telegram_id': self.user_telegram_id,
+            'fecha_creacion': fecha_creacion_bolivia.isoformat(),
+            'timezone': 'America/La_Paz'
         }
 
     def __repr__(self):

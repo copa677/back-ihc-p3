@@ -10,11 +10,11 @@ def crear_orden():
     try:
         data = request.get_json()
         
-        if not data or not data.get('usuario_id'):
+        if not data or not data.get('user_telegram_id'):
             return jsonify({'error': 'El campo usuario_id es requerido'}), 400
         
         orden, error = OrdenService.crear_orden(
-            usuario_id=data['usuario_id'],
+            user_telegram_id=data['user_telegram_id'],
             estado=data.get('estado', 'pendiente')
         )
         
@@ -52,11 +52,11 @@ def obtener_todas_ordenes():
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
 
-@orden_bp.route('/usuario/<int:usuario_id>', methods=['GET'])
-def obtener_ordenes_usuario(usuario_id):
+@orden_bp.route('/usuario/<int:user_telegram_id>', methods=['GET'])
+def obtener_ordenes_usuario(user_telegram_id):
     """Obtiene todas las órdenes de un usuario"""
     try:
-        ordenes = OrdenService.obtener_ordenes_por_usuario(usuario_id)
+        ordenes = OrdenService.obtener_ordenes_por_usuario(user_telegram_id)
         
         ordenes_con_detalles = []
         for orden in ordenes:

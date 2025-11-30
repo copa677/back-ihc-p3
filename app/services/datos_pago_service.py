@@ -15,7 +15,7 @@ class DatosPagoService:
                 codigo_seguridad=datos['codigo_seguridad'],
                 pais=datos['pais'],
                 codigo_postal=datos['codigo_postal'],
-                usuario_id=datos['usuario_id']
+                user_telegram_id=datos['user_telegram_id']
             )
             
             db.session.add(datos_pago)
@@ -35,10 +35,10 @@ class DatosPagoService:
             return None
     
     @staticmethod
-    def obtener_datos_pago_por_usuario(usuario_id):
+    def obtener_datos_pago_por_usuario(user_telegram_id):
         """Obtiene todos los datos de pago de un usuario"""
         try:
-            return DatosPago.query.filter_by(usuario_id=usuario_id).all()
+            return DatosPago.query.filter_by(user_telegram_id=user_telegram_id).all()
         except SQLAlchemyError:
             return []
     

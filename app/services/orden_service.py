@@ -7,11 +7,11 @@ from sqlalchemy.exc import SQLAlchemyError
 class OrdenService:
     
     @staticmethod
-    def crear_orden(usuario_id, estado='pendiente'):
+    def crear_orden(user_telegram_id, estado='pendiente'):
         """Crea una nueva orden"""
         try:
             orden = Orden(
-                usuario_id=usuario_id,
+                user_telegram_id=user_telegram_id,
                 estado=estado
             )
             
@@ -32,10 +32,10 @@ class OrdenService:
             return None
     
     @staticmethod
-    def obtener_ordenes_por_usuario(usuario_id):
+    def obtener_ordenes_por_usuario(user_telegram_id):
         """Obtiene todas las órdenes de un usuario"""
         try:
-            return Orden.query.filter_by(usuario_id=usuario_id).all()
+            return Orden.query.filter_by(user_telegram_id=user_telegram_id).all()
         except SQLAlchemyError:
             return []
     
@@ -214,3 +214,41 @@ class OrdenService:
         except SQLAlchemyError as e:
             db.session.rollback()
             return None, f"Error al crear factura: {str(e)}"
+    
+    @staticmethod
+    def procesar_orden_completada(orden_cod, latitud_cliente=None, longitud_cliente=None):
+        """Procesa una orden completada y busca delivery cercano"""
+        try:
+            orden = OrdenService.obtener_orden_por_cod(orden_cod)
+            if not orden:
+                return None, "Orden no encontrada"
+            
+            # Buscar delivery más cercano si se proporcionan coordenadas
+            if latitud_cliente and longitud_cliente:
+                from app.services.notificacion_service import NotificacionService
+                
+                delivery_cercano, error = NotificacionService.encontrar_delivery_cercano(
+                    latitud_cliente, longitud_cliente
+                )
+                
+                if error or not delivery_cercano:
+                    return None, "No se encontró ningún delivery disponible"
+                
+                # Crear notificación para el delivery
+                notificacion, error = NotificacionService.crear_notificacion_orden(
+                    delivery_cercano.id, orden_cod
+                )
+                
+                if error:
+                    return None, error
+                
+                return {
+                    'orden': orden,
+                    'delivery_asignado': delivery_cercano,
+                    'notificacion': notificacion
+                }, None
+            
+            return orden, None
+            
+        except Exception as e:
+            return None, f"Error al procesar orden: {str(e)}"    

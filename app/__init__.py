@@ -34,18 +34,19 @@ def create_app(config_class=Config):
     from app.routes.datos_envio import datos_envio_bp
     from app.routes.datos_pago import datos_pago_bp
     from app.routes.productos import productos_bp
-    from app.routes.carrito import carrito_bp
     from app.routes.orden import orden_bp
     from app.routes.factura import factura_bp
+    from app.routes.user_telegram import user_telegram_bp
+    from app.routes.delivery import delivery_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
     app.register_blueprint(datos_envio_bp, url_prefix='/api/datos-envio')
     app.register_blueprint(datos_pago_bp, url_prefix='/api/datos-pago')
     app.register_blueprint(productos_bp, url_prefix='/api/productos')
-    app.register_blueprint(carrito_bp, url_prefix='/api/carrito')
     app.register_blueprint(orden_bp, url_prefix='/api/orden')
     app.register_blueprint(factura_bp, url_prefix='/api/factura')
+    app.register_blueprint(user_telegram_bp, url_prefix='/api/user-telegram')
+    app.register_blueprint(delivery_bp, url_prefix='/api/delivery_bp')
 
     
     return app

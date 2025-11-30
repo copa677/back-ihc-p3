@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 import pytz
 
 def get_bolivia_time():
@@ -7,22 +8,27 @@ def get_bolivia_time():
     bolivia_tz = pytz.timezone('America/La_Paz')
     return datetime.now(bolivia_tz)
 
-class DatosEnvio(db.Model):
-    __tablename__ = 'datos_envio'
+class UserDelivery(db.Model):
+    __tablename__ = 'user_delivery'
     
     id = db.Column(db.Integer, primary_key=True)
-    latitud = db.Column(db.Numeric(10,7), nullable=False)
-    longitud = db.Column(db.Numeric(10,7), nullable=False)
-    ciudad = db.Column(db.String(100), nullable=False)
-    region = db.Column(db.String(100), nullable=False)
-    codigo_postal = db.Column(db.String(20), nullable=False)
-    nombre_completo = db.Column(db.String(150), nullable=False)
-    telefono = db.Column(db.String(20), nullable=False)
-    comentario = db.Column(db.Text)
-    user_telegram_id = db.Column(db.Integer, db.ForeignKey('user_telegram.id'), nullable=False)
+    username = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(256), nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=lambda: get_bolivia_time())
+    esta_activo = db.Column(db.Boolean, default=True)
+    latitud = db.Column(db.Numeric(10,7))
+    longitud = db.Column(db.Numeric(10,7))
+
+    def set_password(self, password):
+        """Genera el hash de la contraseña"""
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Verifica la contraseña con el hash almacenado"""
+        return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
+        """Convierte el objeto a diccionario para JSON"""
         # Convertir a zona horaria de Bolivia para la respuesta
         bolivia_tz = pytz.timezone('America/La_Paz')
         
@@ -34,18 +40,13 @@ class DatosEnvio(db.Model):
         
         return {
             'id': self.id,
+            'username': self.username,
+            'fecha_creacion': fecha_creacion_bolivia.isoformat(),
+            'esta_activo': self.esta_activo,
             'latitud': float(self.latitud) if self.latitud else None,
             'longitud': float(self.longitud) if self.longitud else None,
-            'ciudad': self.ciudad,
-            'region': self.region,
-            'codigo_postal': self.codigo_postal,
-            'nombre_completo': self.nombre_completo,
-            'telefono': self.telefono,
-            'comentario': self.comentario,
-            'user_telegram_id': self.user_telegram_id,
-            'fecha_creacion': fecha_creacion_bolivia.isoformat(),
             'timezone': 'America/La_Paz'
         }
 
     def __repr__(self):
-        return f'<DatosEnvio {self.nombre_completo}>'
+        return f'<Usuario {self.username}>'
