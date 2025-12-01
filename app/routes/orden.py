@@ -243,3 +243,41 @@ def eliminar_orden(orden_cod):
         
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
+    
+@orden_bp.route('/<int:orden_cod>/procesar', methods=['POST'])
+def procesar_orden(orden_cod):
+    """Procesa una orden completada y busca delivery cercano"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'latitud_cliente' not in data or 'longitud_cliente' not in data:
+            return jsonify({
+                'error': 'Se requieren latitud_cliente y longitud_cliente'
+            }), 400
+        
+        # Procesar la orden y buscar delivery cercano
+        resultado, error = OrdenService.procesar_orden_completada(
+            orden_cod=orden_cod,
+            latitud_cliente=data['latitud_cliente'],
+            longitud_cliente=data['longitud_cliente']
+        )
+        
+        if error:
+            return jsonify({'error': error}), 400
+        
+        # Extraer los datos del resultado
+        orden = resultado['orden']
+        delivery_asignado = resultado.get('delivery_asignado')
+        notificacion = resultado.get('notificacion')
+        
+        response_data = {
+            'mensaje': 'Orden procesada exitosamente',
+            'orden': orden.to_dict(),
+            'delivery_asignado': delivery_asignado.to_dict() if delivery_asignado else None,
+            'notificacion': notificacion.to_dict() if notificacion else None
+        }
+        
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
