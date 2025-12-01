@@ -252,3 +252,35 @@ class OrdenService:
             
         except Exception as e:
             return None, f"Error al procesar orden: {str(e)}"    
+        
+    @staticmethod
+    def crear_orden_con_asignacion_automatica(user_telegram_id, restaurant_lat, restaurant_lon, estado='pendiente'):
+        """
+        Crea una nueva orden y la asigna automáticamente al delivery más cercano.
+        Inicializa el registro de rechazos para esta orden.
+        """
+        from app.utils.distance_calculator import find_closest_delivery, assign_order_to_closest_delivery
+        from app.utils.rechazos_manager import inicializar_rechazos_orden
+        
+        try:
+            # Primero crear la orden
+            orden, error = OrdenService.crear_orden(user_telegram_id, estado)
+            if error:
+                return None, None, None, error
+            
+            # INICIALIZAR registro de rechazos para esta nueva orden
+            inicializar_rechazos_orden(orden.cod)
+            
+            # Asignar automáticamente al delivery más cercano
+            success, message, delivery = assign_order_to_closest_delivery(
+                orden.cod, restaurant_lat, restaurant_lon
+            )
+            
+            if not success:
+                return orden, None, message, None
+            
+            return orden, delivery, f"Orden {orden.cod} asignada a {delivery.username}", None
+            
+        except Exception as e:
+            db.session.rollback()
+            return None, None, None, f"Error al crear orden con asignación automática: {str(e)}"

@@ -18,6 +18,7 @@ class UserDelivery(db.Model):
     esta_activo = db.Column(db.Boolean, default=True)
     latitud = db.Column(db.Numeric(10,7))
     longitud = db.Column(db.Numeric(10,7))
+    id_orden = db.Column(db.Integer, nullable=True)
 
     def set_password(self, password):
         """Genera el hash de la contraseña"""
@@ -45,7 +46,8 @@ class UserDelivery(db.Model):
             'esta_activo': self.esta_activo,
             'latitud': float(self.latitud) if self.latitud else None,
             'longitud': float(self.longitud) if self.longitud else None,
-            'timezone': 'America/La_Paz'
+            'timezone': 'America/La_Paz',
+            'id_orden': self.id_orden
         }
 
     def __repr__(self):

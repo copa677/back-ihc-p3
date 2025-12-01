@@ -10,7 +10,7 @@ class DatosEnvioService:
         try:
             datos_envio = DatosEnvio(
                 latitud=datos['latitud'],
-                longitud=datos.get('longitud'),
+                longitud=datos('longitud'),
                 ciudad=datos['ciudad'],
                 region=datos['region'],
                 codigo_postal=datos['codigo_postal'],
@@ -18,6 +18,7 @@ class DatosEnvioService:
                 telefono=datos['telefono'],
                 comentario=datos.get('comentario'),
                 user_telegram_id=datos['user_telegram_id']
+                orden_id=datos['orden_id']
             )
             
             db.session.add(datos_envio)
@@ -89,3 +90,38 @@ class DatosEnvioService:
         except SQLAlchemyError as e:
             db.session.rollback()
             return False, f"Error al eliminar datos de envío: {str(e)}"
+        
+    @staticmethod
+    def obtener_ubicacion_por_orden(orden_id):
+        """
+        Obtiene SOLO la latitud y longitud de los datos de envío de una orden.
+        
+        Args:
+            orden_id: ID de la orden
+        
+        Returns:
+            Dict con latitud y longitud o None si no existe
+        """
+        try:
+            datos_envio = DatosEnvio.query.filter_by(orden_id=orden_id).first()
+            
+            if not datos_envio:
+                return None
+            
+            return {
+                'latitud': float(datos_envio.latitud) if datos_envio.latitud else None,
+                'longitud': float(datos_envio.longitud) if datos_envio.longitud else None,
+                'direccion_completa': {
+                    'ciudad': datos_envio.ciudad,
+                    'region': datos_envio.region,
+                    'codigo_postal': datos_envio.codigo_postal
+                },
+                'contacto': {
+                    'nombre_completo': datos_envio.nombre_completo,
+                    'telefono': datos_envio.telefono
+                },
+                'orden_id': orden_id,
+                'datos_envio_id': datos_envio.id
+            }
+        except SQLAlchemyError:
+            return None

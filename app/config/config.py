@@ -16,6 +16,10 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Coordenadas del restaurante (pueden sobrescribirse con variables de entorno)
+    RESTAURANT_LAT = float(os.environ.get('RESTAURANT_LAT', -17.783361))
+    RESTAURANT_LON = float(os.environ.get('RESTAURANT_LON', -63.182088))
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

@@ -24,7 +24,12 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     jwt.init_app(app)
     cors.init_app(app)
-
+    # Configurar CORS - solo una vez, sin after_request
+    CORS(app, 
+         resources={r"/api/*": {"origins": "*"}},
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         supports_credentials=False)
 
 
 
@@ -37,7 +42,7 @@ def create_app(config_class=Config):
     from app.routes.orden import orden_bp
     from app.routes.factura import factura_bp
     from app.routes.user_telegram import user_telegram_bp
-    from app.routes.delivery import delivery_bp
+    from app.routes.tracking import tracking_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(datos_envio_bp, url_prefix='/api/datos-envio')
@@ -46,7 +51,7 @@ def create_app(config_class=Config):
     app.register_blueprint(orden_bp, url_prefix='/api/orden')
     app.register_blueprint(factura_bp, url_prefix='/api/factura')
     app.register_blueprint(user_telegram_bp, url_prefix='/api/user-telegram')
-    app.register_blueprint(delivery_bp, url_prefix='/api/delivery_bp')
+    app.register_blueprint(tracking_bp, url_prefix='/api/tracking')
 
     
     return app

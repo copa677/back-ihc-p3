@@ -10,8 +10,7 @@ def crear_datos_envio():
         data = request.get_json()
         
         # Validar campos requeridos
-        campos_requeridos = ['direccion1', 'ciudad', 'region', 'codigo_postal', 
-                           'nombre_completo', 'telefono', 'usuario_id']
+        campos_requeridos = ['latitud', 'longitud', 'user_telegram_id','orden_id']
         
         for campo in campos_requeridos:
             if not data.get(campo):
@@ -104,3 +103,20 @@ def eliminar_datos_envio(datos_envio_id):
         
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
+    
+@datos_envio_bp.route('/orden/<int:orden_id>/ubicacion', methods=['GET'])
+def obtener_ubicacion_orden(orden_id):
+    """Obtiene SOLO la ubicación (latitud/longitud) de una orden específica"""
+    try:
+        ubicacion = DatosEnvioService.obtener_ubicacion_por_orden(orden_id)
+        
+        if not ubicacion:
+            return jsonify({
+                'mensaje': 'No se encontraron datos de envío para esta orden',
+                'orden_id': orden_id
+            }), 404
+        
+        return jsonify({
+            'ubicacion': ubicacion,
+            'orden_id': orden_id
+        }), 200

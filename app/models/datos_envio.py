@@ -20,6 +20,7 @@ class DatosEnvio(db.Model):
     telefono = db.Column(db.String(20), nullable=False)
     comentario = db.Column(db.Text)
     user_telegram_id = db.Column(db.Integer, db.ForeignKey('user_telegram.id'), nullable=False)
+    orden_id = db.Column(db.Integer, db.ForeignKey('orden.cod'), nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=lambda: get_bolivia_time())
 
     def to_dict(self):
@@ -43,6 +44,7 @@ class DatosEnvio(db.Model):
             'telefono': self.telefono,
             'comentario': self.comentario,
             'user_telegram_id': self.user_telegram_id,
+            'orden_id': self.orden_id,
             'fecha_creacion': fecha_creacion_bolivia.isoformat(),
             'timezone': 'America/La_Paz'
         }

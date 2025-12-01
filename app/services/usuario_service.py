@@ -98,3 +98,44 @@ class UsuarioService:
         except SQLAlchemyError as e:
             db.session.rollback()
             return False, f"Error al eliminar usuario: {str(e)}"
+        
+    @staticmethod
+    def actualizar_ubicacion_delivery(delivery_id, nueva_latitud, nueva_longitud):
+        """
+        Actualiza la ubicación de un delivery y retorna su id_orden actual.
+        
+        Args:
+            delivery_id: ID del delivery
+            nueva_latitud: Nueva latitud
+            nueva_longitud: Nueva longitud
+        
+        Returns:
+            Tuple (id_orden_actual, delivery_actualizado, error)
+            - id_orden_actual: El id_orden actual del delivery (puede ser None)
+            - delivery_actualizado: El objeto UserDelivery actualizado
+            - error: Mensaje de error si ocurre
+        """
+        try:
+            # Obtener el delivery
+            delivery = UserDelivery.query.get(delivery_id)
+            if not delivery:
+                return None, None, "Delivery no encontrado"
+            
+            # Verificar que el delivery esté activo
+            if not delivery.esta_activo:
+                return delivery.id_orden, delivery, "Delivery inactivo (ubicación actualizada igualmente)"
+            
+            # Actualizar ubicación
+            delivery.latitud = nueva_latitud
+            delivery.longitud = nueva_longitud
+            
+            db.session.commit()
+            
+            # Retornar id_orden actual (puede ser None o un número)
+            return delivery.id_orden, delivery, None
+            
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return None, None, f"Error en la base de datos: {str(e)}"
+        except Exception as e:
+            return None, None, f"Error al actualizar ubicación: {str(e)}"

@@ -1,4 +1,4 @@
-from app.models.notificacion import Notificacion
+
 from app.models.tracking_orden import TrackingOrden
 from app.models.user_delivery import UserDelivery
 from app import db

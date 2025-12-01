@@ -65,3 +65,53 @@ def eliminar_usuario(usuario_id):
         
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
+    
+@usuarios_bp.route('/<int:delivery_id>/ubicacion', methods=['PUT'])
+def actualizar_ubicacion_delivery_endpoint(delivery_id):
+    """Actualiza la ubicación de un delivery y retorna su id_orden actual"""
+    try:
+        data = request.get_json()
+        
+        # Validar campos requeridos
+        if not data or data.get('latitud') is None or data.get('longitud') is None:
+            return jsonify({'error': 'Los campos latitud y longitud son requeridos'}), 400
+        
+        # Validar que sean números
+        try:
+            latitud = float(data['latitud'])
+            longitud = float(data['longitud'])
+        except ValueError:
+            return jsonify({'error': 'Latitud y longitud deben ser números válidos'}), 400
+        
+        # Validar rangos de coordenadas (opcional)
+        if not (-90 <= latitud <= 90):
+            return jsonify({'error': 'Latitud debe estar entre -90 y 90'}), 400
+        if not (-180 <= longitud <= 180):
+            return jsonify({'error': 'Longitud debe estar entre -180 y 180'}), 400
+        
+        # Actualizar ubicación
+        id_orden_actual, delivery, error = UsuarioService.actualizar_ubicacion_delivery(
+            delivery_id=delivery_id,
+            nueva_latitud=latitud,
+            nueva_longitud=longitud
+        )
+        
+        if error:
+            # Si es solo un warning (delivery inactivo), igual retornamos éxito
+            if "inactivo" in error.lower():
+                return jsonify({
+                    'warning': error,
+                    'id_orden_actual': id_orden_actual,
+                    'delivery': delivery.to_dict() if delivery else None
+                }), 200
+            return jsonify({'error': error}), 400
+        
+        # Si todo fue bien
+        return jsonify({
+            'mensaje': 'Ubicación actualizada exitosamente',
+            'id_orden_actual': id_orden_actual,  # Esto es lo importante
+            'delivery': delivery.to_dict()
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
