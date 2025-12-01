@@ -120,3 +120,6 @@ def obtener_ubicacion_orden(orden_id):
             'ubicacion': ubicacion,
             'orden_id': orden_id
         }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500

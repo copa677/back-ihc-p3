@@ -10,14 +10,14 @@ class DatosEnvioService:
         try:
             datos_envio = DatosEnvio(
                 latitud=datos['latitud'],
-                longitud=datos('longitud'),
+                longitud=datos['longitud'],
                 ciudad=datos['ciudad'],
                 region=datos['region'],
                 codigo_postal=datos['codigo_postal'],
                 nombre_completo=datos['nombre_completo'],
                 telefono=datos['telefono'],
                 comentario=datos.get('comentario'),
-                user_telegram_id=datos['user_telegram_id']
+                user_telegram_id=datos['user_telegram_id'],
                 orden_id=datos['orden_id']
             )
             

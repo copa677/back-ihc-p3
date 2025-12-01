@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services.orden_service import OrdenService
+from app.services.usuario_service import UsuarioService
 from app.services.factura_service import FacturaService
 
 orden_bp = Blueprint('orden', __name__)
