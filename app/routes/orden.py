@@ -295,7 +295,7 @@ def crear_orden_con_asignacion():
             return jsonify({'error': 'El campo user_telegram_id es requerido'}), 400
         
         # Usar coordenadas del restaurante desde variables de entorno o valores por defecto
-        from app import current_app
+        from flask import current_app
         
         restaurant_lat = float(data.get('restaurant_lat', current_app.config.get('RESTAURANT_LAT', -17.783361)))
         restaurant_lon = float(data.get('restaurant_lon', current_app.config.get('RESTAURANT_LON', -63.182088)))

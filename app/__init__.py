@@ -43,6 +43,7 @@ def create_app(config_class=Config):
     from app.routes.factura import factura_bp
     from app.routes.user_telegram import user_telegram_bp
     from app.routes.tracking import tracking_bp
+    from app.routes.usuarios import usuarios_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(datos_envio_bp, url_prefix='/api/datos-envio')
@@ -52,6 +53,7 @@ def create_app(config_class=Config):
     app.register_blueprint(factura_bp, url_prefix='/api/factura')
     app.register_blueprint(user_telegram_bp, url_prefix='/api/user-telegram')
     app.register_blueprint(tracking_bp, url_prefix='/api/tracking')
+    app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
 
     
     return app
