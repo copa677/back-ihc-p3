@@ -19,6 +19,9 @@ class Config:
     # Coordenadas del restaurante (pueden sobrescribirse con variables de entorno)
     RESTAURANT_LAT = float(os.environ.get('RESTAURANT_LAT', -17.783361))
     RESTAURANT_LON = float(os.environ.get('RESTAURANT_LON', -63.182088))
+    
+    # Configuración de Telegram Bot
+    TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 class DevelopmentConfig(Config):
     DEBUG = True

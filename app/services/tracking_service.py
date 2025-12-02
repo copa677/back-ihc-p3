@@ -1,6 +1,10 @@
 from app.models.tracking_orden import TrackingOrden
+from app.models.orden import Orden
+from app.models.user_telgram import UserTelegram
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
+from flask import current_app
+import requests
 
 class TrackingService:
     
@@ -128,3 +132,67 @@ class TrackingService:
             ).all()
         except SQLAlchemyError:
             return []
+    
+    @staticmethod
+    def enviar_notificacion_telegram(tracking_id, estado):
+        """
+        Envía una notificación al usuario de Telegram cuando cambia el estado del tracking.
+        
+        Args:
+            tracking_id: ID del tracking
+            estado: Nuevo estado del tracking
+        
+        Returns:
+            tuple: (success: bool, error: str or None)
+        """
+        try:
+            # Obtener el tracking
+            tracking = TrackingOrden.query.get(tracking_id)
+            if not tracking:
+                return False, "Tracking no encontrado"
+            
+            # Obtener la orden asociada
+            orden = Orden.query.get(tracking.orden_cod)
+            if not orden:
+                return False, "Orden no encontrada"
+            
+            # Obtener el usuario de Telegram
+            user_telegram = UserTelegram.query.get(orden.user_telegram_id)
+            if not user_telegram:
+                return False, "Usuario de Telegram no encontrado"
+            
+            # Obtener el token del bot
+            bot_token = current_app.config.get('TELEGRAM_BOT_TOKEN')
+            if not bot_token:
+                return False, "Token del bot de Telegram no configurado"
+            
+            # Definir mensajes según el estado
+            mensajes = {
+                'asignada': f'🚚 ¡Tu pedido #{orden.cod} ha sido asignado a un delivery!\n\nEstaremos recogiendo tu pedido pronto.',
+                'recogiendo': f'📦 El delivery está recogiendo tu pedido #{orden.cod}\n\n¡Ya casi estamos en camino!',
+                'en_camino': f'🛵 ¡Tu pedido #{orden.cod} está en camino!\n\nLlegará pronto a tu destino.',
+                'entregada': f'✅ ¡Tu pedido #{orden.cod} ha sido entregado!\n\nGracias por tu preferencia. 🎉',
+                'cancelada': f'❌ Tu pedido #{orden.cod} ha sido cancelado.\n\nSi tienes preguntas, contáctanos.'
+            }
+            
+            mensaje = mensajes.get(estado, f'Estado actualizado: {estado}')
+            
+            # Enviar mensaje a Telegram
+            url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+            payload = {
+                'chat_id': user_telegram.chat_id,
+                'text': mensaje,
+                'parse_mode': 'HTML'
+            }
+            
+            response = requests.post(url, json=payload, timeout=10)
+            
+            if response.status_code == 200:
+                return True, None
+            else:
+                return False, f"Error en API de Telegram: {response.text}"
+                
+        except requests.exceptions.RequestException as e:
+            return False, f"Error de conexión con Telegram: {str(e)}"
+        except Exception as e:
+            return False, f"Error al enviar notificación: {str(e)}"

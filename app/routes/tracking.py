@@ -38,6 +38,16 @@ def crear_tracking():
         if error:
             return jsonify({'error': error}), 400
         
+        # Enviar notificación a Telegram sobre el nuevo tracking
+        success, notif_error = TrackingService.enviar_notificacion_telegram(
+            tracking.id, 
+            data['estado']
+        )
+        
+        # La notificación es opcional, no fallar si hay error
+        if not success:
+            print(f"Advertencia: No se pudo enviar notificación de Telegram: {notif_error}")
+        
         return jsonify({
             'mensaje': 'Tracking creado exitosamente',
             'tracking': tracking.to_dict()
@@ -86,6 +96,17 @@ def actualizar_tracking(tracking_id):
         
         if error:
             return jsonify({'error': error}), 400
+        
+        # Si se actualizó el estado, enviar notificación a Telegram
+        if 'estado' in data:
+            success, notif_error = TrackingService.enviar_notificacion_telegram(
+                tracking_id, 
+                data['estado']
+            )
+            
+            # La notificación es opcional, no fallar si hay error
+            if not success:
+                print(f"Advertencia: No se pudo enviar notificación de Telegram: {notif_error}")
         
         return jsonify({
             'mensaje': 'Tracking actualizado exitosamente',
