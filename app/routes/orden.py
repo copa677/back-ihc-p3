@@ -318,19 +318,19 @@ def crear_orden_con_asignacion():
             'asignacion_exitosa': delivery is not None
         }
         
-        # Opcional: Crear tracking automático si se desea
-        if delivery and data.get('crear_tracking_automatico', False):
-            from app.services.tracking_service import TrackingService
-            tracking, tracking_error = TrackingService.crear_tracking(
-                orden_cod=orden.cod,
-                user_delivery_id=delivery.id,
-                estado='asignada',
-                latitud=delivery.latitud,
-                longitud=delivery.longitud,
-                comentario='Asignación automática'
-            )
-            if not tracking_error:
-                response['tracking_creado'] = tracking.to_dict()
+        # # Opcional: Crear tracking automático si se desea
+        # if delivery and data.get('crear_tracking_automatico', False):
+        #     from app.services.tracking_service import TrackingService
+        #     tracking, tracking_error = TrackingService.crear_tracking(
+        #         orden_cod=orden.cod,
+        #         user_delivery_id=delivery.id,
+        #         estado='asignada',
+        #         latitud=delivery.latitud,
+        #         longitud=delivery.longitud,
+        #         comentario='Asignación automática'
+        #     )
+        #     if not tracking_error:
+        #         response['tracking_creado'] = tracking.to_dict()
         
         return jsonify(response), 201
         
@@ -372,16 +372,16 @@ def rechazar_orden_delivery(orden_cod):
         if not success:
             return jsonify({'error': 'Error al procesar el rechazo'}), 500
         
-        # Crear tracking del rechazo
-        from app.services.tracking_service import TrackingService
-        tracking, error = TrackingService.crear_tracking(
-            orden_cod=orden_cod,
-            user_delivery_id=delivery_id,
-            estado='cancelada',
-            latitud=delivery.latitud,
-            longitud=delivery.longitud,
-            comentario=data.get('comentario', 'Orden rechazada por el delivery')
-        )
+        # # Crear tracking del rechazo
+        # from app.services.tracking_service import TrackingService
+        # tracking, error = TrackingService.crear_tracking(
+        #     orden_cod=orden_cod,
+        #     user_delivery_id=delivery_id,
+        #     estado='cancelada',
+        #     latitud=delivery.latitud,
+        #     longitud=delivery.longitud,
+        #     comentario=data.get('comentario', 'Orden rechazada por el delivery')
+        # )
         
         # Actualizar estado de la orden a 'pendiente' para reasignación
         OrdenService.actualizar_estado_orden(orden_cod, 'pendiente')
@@ -391,7 +391,7 @@ def rechazar_orden_delivery(orden_cod):
             'delivery_liberado': True,
             'rechazo_registrado': True,
             'orden_estado': 'pendiente',
-            'tracking': tracking.to_dict() if not error else None
+            #'tracking': tracking.to_dict() if not error else None
         }), 200
         
     except Exception as e:
@@ -414,37 +414,35 @@ def reasignar_orden(orden_cod):
             return jsonify({'error': 'La orden no está disponible para reasignación'}), 400
         
         # Obtener coordenadas del restaurante
-        from app import current_app
-        restaurant_lat = current_app.config.get('RESTAURANT_LAT', -17.783361)
-        restaurant_lon = current_app.config.get('RESTAURANT_LON', -63.182088)
+        import os
+        restaurant_lat = float(os.environ.get('RESTAURANT_LAT', -17.783361))
+        restaurant_lon = float(os.environ.get('RESTAURANT_LON', -63.182088))
         
         # Buscar NUEVO delivery (excluyendo rechazos)
         from app.utils.distance_calculator import assign_order_to_closest_delivery
         success, message, delivery = assign_order_to_closest_delivery(
-            orden_cod=orden_cod,
-            restaurant_lat=restaurant_lat,
-            restaurant_lon=restaurant_lon
+            orden_cod=orden_cod
         )
         
         if not success:
             return jsonify({'error': message}), 400
         
-        # Crear tracking de reasignación
-        from app.services.tracking_service import TrackingService
-        tracking, error = TrackingService.crear_tracking(
-            orden_cod=orden_cod,
-            user_delivery_id=delivery.id,
-            estado='asignada',
-            latitud=delivery.latitud,
-            longitud=delivery.longitud,
-            comentario='Reasignación después de rechazo previo'
-        )
+        # # Crear tracking de reasignación
+        # from app.services.tracking_service import TrackingService
+        # tracking, error = TrackingService.crear_tracking(
+        #     orden_cod=orden_cod,
+        #     user_delivery_id=delivery.id,
+        #     estado='asignada',
+        #     latitud=delivery.latitud,
+        #     longitud=delivery.longitud,
+        #     comentario='Reasignación después de rechazo previo'
+        # )
         
         return jsonify({
             'mensaje': message,
             'orden': orden.to_dict(),
             'nuevo_delivery': delivery.to_dict(),
-            'tracking': tracking.to_dict() if not error else None
+            #'tracking': tracking.to_dict() if not error else None
         }), 200
         
     except Exception as e:

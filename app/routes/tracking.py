@@ -137,7 +137,7 @@ def eliminar_tracking(tracking_id):
 
 @tracking_bp.route('/delivery/<int:delivery_id>/historial', methods=['GET'])
 def obtener_historial_delivery(delivery_id):
-    """Obtiene el historial de tracking de un delivery específico"""
+    """Obtiene el historial de tracking de un delivery específico con datos de envío"""
     try:
         # Verificar que el delivery existe
         delivery = UsuarioService.obtener_usuario_por_id(delivery_id)
@@ -154,7 +154,7 @@ def obtener_historial_delivery(delivery_id):
             'delivery_id': delivery_id,
             'delivery_username': delivery.username,
             'limit': limit,
-            'historial': [tracking.to_dict() for tracking in historial],
+            'historial': historial,
             'total_registros': len(historial)
         }), 200
         
@@ -165,13 +165,13 @@ def obtener_historial_delivery(delivery_id):
 
 @tracking_bp.route('/orden/<int:orden_cod>/historial', methods=['GET'])
 def obtener_historial_orden(orden_cod):
-    """Obtiene el historial de tracking de una orden específica"""
+    """Obtiene el historial de tracking de una orden específica con datos de envío"""
     try:
         historial = TrackingService.obtener_trackings_por_orden(orden_cod)
         
         return jsonify({
             'orden_cod': orden_cod,
-            'historial': [tracking.to_dict() for tracking in historial],
+            'historial': historial,
             'total_registros': len(historial)
         }), 200
         

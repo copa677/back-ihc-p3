@@ -104,7 +104,7 @@ def eliminar_datos_envio(datos_envio_id):
     except Exception as e:
         return jsonify({'error': f'Error en el servidor: {str(e)}'}), 500
     
-@datos_envio_bp.route('/orden/<int:orden_id>/ubicacion', methods=['GET'])
+@datos_envio_bp.route('/<int:orden_id>/ubicacion', methods=['GET'])
 def obtener_ubicacion_orden(orden_id):
     """Obtiene SOLO la ubicación (latitud/longitud) de una orden específica"""
     try:

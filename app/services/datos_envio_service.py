@@ -118,7 +118,8 @@ class DatosEnvioService:
                 },
                 'contacto': {
                     'nombre_completo': datos_envio.nombre_completo,
-                    'telefono': datos_envio.telefono
+                    'telefono': datos_envio.telefono,
+                    'comentario': datos_envio.comentario
                 },
                 'orden_id': orden_id,
                 'datos_envio_id': datos_envio.id

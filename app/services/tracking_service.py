@@ -1,10 +1,12 @@
 from app.models.tracking_orden import TrackingOrden
 from app.models.orden import Orden
 from app.models.user_telgram import UserTelegram
+from app.models.user_delivery import UserDelivery
+from app.models.datos_envio import DatosEnvio
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
-from flask import current_app
 import requests
+import os
 
 class TrackingService:
     
@@ -21,6 +23,11 @@ class TrackingService:
             comentario: Observaciones (opcionales)
         """
         try:
+            # Buscar el user_delivery y cambiar su id_orden a null
+            user_delivery = UserDelivery.query.get(user_delivery_id)
+            if user_delivery:
+                user_delivery.id_orden = None
+            
             tracking = TrackingOrden(
                 orden_cod=orden_cod,
                 user_delivery_id=user_delivery_id,
@@ -101,7 +108,7 @@ class TrackingService:
     @staticmethod
     def obtener_historial_por_delivery(user_delivery_id, limit=None):
         """
-        Obtiene el historial de tracking de un delivery específico.
+        Obtiene el historial de tracking de un delivery específico con datos de envío.
         
         Args:
             user_delivery_id: ID del delivery
@@ -117,19 +124,63 @@ class TrackingService:
             if limit:
                 query = query.limit(limit)
             
-            return query.all()
+            trackings = query.all()
+            
+            # Crear resultado con información adicional de datos de envío
+            resultado = []
+            for tracking in trackings:
+                tracking_dict = tracking.to_dict()
+                
+                # Obtener datos de envío de la orden
+                datos_envio = DatosEnvio.query.filter_by(orden_id=tracking.orden_cod).first()
+                
+                # Agregar datos de envío si existen
+                if datos_envio:
+                    tracking_dict['datos_envio'] = {
+                        'nombre_completo': datos_envio.nombre_completo,
+                        'telefono': datos_envio.telefono,
+                        'comentario': datos_envio.comentario
+                    }
+                else:
+                    tracking_dict['datos_envio'] = None
+                
+                resultado.append(tracking_dict)
+            
+            return resultado
         except SQLAlchemyError:
             return []
 
     @staticmethod
     def obtener_trackings_por_orden(orden_cod):
-        """Obtiene todos los trackings de una orden específica"""
+        """Obtiene todos los trackings de una orden específica con datos de envío"""
         try:
-            return TrackingOrden.query.filter_by(
+            trackings = TrackingOrden.query.filter_by(
                 orden_cod=orden_cod
             ).order_by(
                 TrackingOrden.fecha_creacion.desc()
             ).all()
+            
+            # Obtener datos de envío de la orden
+            datos_envio = DatosEnvio.query.filter_by(orden_id=orden_cod).first()
+            
+            # Crear resultado con información adicional
+            resultado = []
+            for tracking in trackings:
+                tracking_dict = tracking.to_dict()
+                
+                # Agregar datos de envío si existen
+                if datos_envio:
+                    tracking_dict['datos_envio'] = {
+                        'nombre_completo': datos_envio.nombre_completo,
+                        'telefono': datos_envio.telefono,
+                        'comentario': datos_envio.comentario
+                    }
+                else:
+                    tracking_dict['datos_envio'] = None
+                
+                resultado.append(tracking_dict)
+            
+            return resultado
         except SQLAlchemyError:
             return []
     
@@ -161,10 +212,10 @@ class TrackingService:
             if not user_telegram:
                 return False, "Usuario de Telegram no encontrado"
             
-            # Obtener el token del bot
-            bot_token = current_app.config.get('TELEGRAM_BOT_TOKEN')
+            # Obtener el token del bot desde las variables de entorno
+            bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
             if not bot_token:
-                return False, "Token del bot de Telegram no configurado"
+                return False, "Token del bot de Telegram no configurado en variables de entorno"
             
             # Definir mensajes según el estado
             mensajes = {

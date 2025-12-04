@@ -115,6 +115,7 @@ class UsuarioService:
             - delivery_actualizado: El objeto UserDelivery actualizado
             - error: Mensaje de error si ocurre
         """
+        print(nueva_latitud, nueva_longitud)
         try:
             # Obtener el delivery
             delivery = UserDelivery.query.get(delivery_id)

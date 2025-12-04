@@ -273,7 +273,7 @@ class OrdenService:
             
             # Asignar automáticamente al delivery más cercano
             success, message, delivery = assign_order_to_closest_delivery(
-                orden.cod, restaurant_lat, restaurant_lon
+                orden.cod
             )
             
             if not success:

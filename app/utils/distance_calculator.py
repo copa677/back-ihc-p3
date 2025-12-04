@@ -93,9 +93,7 @@ def find_closest_delivery(
 
 
 def assign_order_to_closest_delivery(
-    orden_cod: int, 
-    restaurant_lat: float, 
-    restaurant_lon: float
+    orden_cod: int
 ) -> Tuple[bool, str, Optional[UserDelivery]]:
     """
     Asigna una orden al delivery más cercano al restaurante.
@@ -110,7 +108,8 @@ def assign_order_to_closest_delivery(
         Tuple (success, message, delivery_asignado)
     """
     from app import db
-    
+    restaurant_lat = -17.7833073230331
+    restaurant_lon = -63.182132346593605
     try:
         # Buscar el delivery más cercano disponible QUE NO HAYA RECHAZADO ESTA ORDEN
         result = find_closest_delivery(
